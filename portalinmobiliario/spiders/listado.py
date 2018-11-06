@@ -21,7 +21,7 @@ class ListadoSpider(scrapy.Spider):
 
         query = urlparse.parse_qs(parsed.query)
         if query.get("pg"):
-            for i in range(1,int(query.get("pg"))+1):
+            for i in range(1,int(query.get("pg")[0])+1):
                 logging.info("Siguiendo el LINK: "+response.url+"&pg="+str(i))
                 yield scrapy.Request(response.url+"&pg="+str(i), callback = self.inicia)
         else:
