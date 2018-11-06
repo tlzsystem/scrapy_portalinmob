@@ -1,20 +1,35 @@
 # -*- coding: utf-8 -*-
 import scrapy
 import json
+import urllib.parse as urlparse
+import logging
 
 
 class ListadoSpider(scrapy.Spider):
     name = 'listado'
     allowed_domains = ['portalinmobiliario.com']
-    start_urls = ['https://www.portalinmobiliario.com/venta/casa/puente-alto-metropolitana?tp=1&op=1&ca=2&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=2&sf=0&sp=0']
     BASE_URL = 'https://www.portalinmobiliario.com'
 
+    def __init__(self, inicial='', **kwargs):
+        self.start_urls = [inicial]
+        super().__init__(**kwargs)
+
     def parse(self, response):
+
+        urlUltimo = response.css("li.ultima a::attr(href)").extract_first()
+        parsed = urlparse.urlparse(urlUltimo)
+        ultimo = urlparse.parse_qs(parsed.query)["pg"]
+
+        for i in range(1,int(ultimo[0])+1):
+            logging.info("Siguiendo el LINK: https://www.portalinmobiliario.com/venta/casa/puente-alto-metropolitana?tp=1&op=1&ca=2&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=2&sf=0&sp=0&pg="+str(i))
+            yield scrapy.Request("https://www.portalinmobiliario.com/venta/casa/puente-alto-metropolitana?tp=1&op=1&ca=2&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=2&sf=0&sp=0&pg="+str(i), callback = self.inicia)
+            
+    def inicia(self, response):
         lista = response.css('div.product-item-data')
         for item in lista:
             link = item.css('div.product-item-summary h4 a::attr(href)').extract_first()
             yield scrapy.Request(self.BASE_URL+link, callback = self.procesa)
-
+        
             
     def procesa(self, response):
 
@@ -48,4 +63,5 @@ class ListadoSpider(scrapy.Spider):
                 "Precio Real": precio_real,
             }
         else:
+            logging.info(response.url+" ES EMPRESA")
             pass
