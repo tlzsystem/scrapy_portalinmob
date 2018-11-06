@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 import json
-import urllib.parse as urlparse
+import urlparse
 import logging
 
 
