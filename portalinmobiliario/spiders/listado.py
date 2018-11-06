@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 import json
-import urlparse
+import urllib.parse as urlparse
 import logging
 
 
@@ -18,13 +18,20 @@ class ListadoSpider(scrapy.Spider):
 
         urlUltimo = response.css("li.ultima a::attr(href)").extract_first()
         parsed = urlparse.urlparse(urlUltimo)
-        ultimo = urlparse.parse_qs(parsed.query)["pg"]
 
-        for i in range(1,int(ultimo[0])+1):
-            logging.info("Siguiendo el LINK: https://www.portalinmobiliario.com/venta/casa/puente-alto-metropolitana?tp=1&op=1&ca=2&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=2&sf=0&sp=0&pg="+str(i))
-            yield scrapy.Request("https://www.portalinmobiliario.com/venta/casa/puente-alto-metropolitana?tp=1&op=1&ca=2&ts=1&dd=0&dh=6&bd=0&bh=6&or=&mn=2&sf=0&sp=0&pg="+str(i), callback = self.inicia)
-            
+        query = urlparse.parse_qs(parsed.query)
+        if query.get("pg"):
+            for i in range(1,int(ultimo[0])+1):
+                logging.info("Siguiendo el LINK: "+response.url+"&pg="+str(i))
+                yield scrapy.Request(response.url+"&pg="+str(i), callback = self.inicia)
+        else:
+            logging.info("Solo una pagina, se inicia el proceso")
+            lista = response.css('div.product-item-data')
+            for item in lista:
+                link = item.css('div.product-item-summary h4 a::attr(href)').extract_first()
+                yield scrapy.Request(self.BASE_URL+link, callback = self.procesa)
     def inicia(self, response):
+        logging.info("SE INICIA LA BUSQUEDA DE ELEMENTOS")
         lista = response.css('div.product-item-data')
         for item in lista:
             link = item.css('div.product-item-summary h4 a::attr(href)').extract_first()
