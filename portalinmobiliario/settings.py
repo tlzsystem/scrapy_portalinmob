@@ -16,7 +16,7 @@ NEWSPIDER_MODULE = 'portalinmobiliario.spiders'
 
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
-#USER_AGENT = 'portalinmobiliario (+http://www.yourdomain.com)'
+USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.62 Safari/537.36'
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
@@ -90,3 +90,6 @@ ROBOTSTXT_OBEY = True
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 FEED_EXPORT_ENCODING = 'utf-8'
+FEED_FORMAT = 'json'
+FEED_URI = 'file:///var/www/html/exportador.json'
+FEED_STORE_EMPTY = True

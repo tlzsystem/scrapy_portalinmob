@@ -58,8 +58,10 @@ class ListadoSpider(scrapy.Spider):
     def procesa(self, response):
 
         if len(response.css("p.operation-owner-logo"))==0:
-
             fechaSelector = response.css('div.content-panel').css('.small-content-panel p')[1]
+            if len(response.css('div.content-panel').css('.small-content-panel p'))==3:
+
+                fechaSelector = response.css('div.content-panel').css('.small-content-panel p')[2]
             fechaValor = fechaSelector.css('p.operation-internal-code strong::text').extract_first()
             xfecha = fechaValor.split(':')[1].strip().split('-')
             xFi = self.fi.split('-')
